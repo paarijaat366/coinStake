@@ -1,8 +1,0 @@
-.next
-build
-dist
-node_modules
-.git
-*.log
-.env.local
-.env.*.local
