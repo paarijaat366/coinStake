@@ -6,11 +6,34 @@ import { cn } from "@/lib/utils";
 import DataTable from "../ui/DataTable";
 
 const TrendingCoins = async () => {
-  const trendingCoins = await fetcher<{ coins: TrendingCoin[] }>(
-    "/search/trending",
-    undefined,
-    300
-  );
+  let trendingCoins: { coins: TrendingCoin[] } | null = null;
+
+  try {
+    trendingCoins = await fetcher<{ coins: TrendingCoin[] }>(
+      "/search/trending",
+      undefined,
+      300
+    );
+  } catch (error) {
+    console.error("TrendingCoins fetch failed", error);
+    return (
+      <div id="trending-coins" className="p-4 bg-dark-500 rounded-xl">
+        <h4>Trending coins</h4>
+        <div className="text-sm text-muted-foreground">
+          Unable to load trending coins. Please try again later.
+        </div>
+      </div>
+    );
+  }
+
+  if (!trendingCoins?.coins?.length) {
+    return (
+      <div id="trending-coins" className="p-4 bg-dark-500 rounded-xl">
+        <h4>Trending coins</h4>
+        <div className="text-sm text-muted-foreground">No trending data available.</div>
+      </div>
+    );
+  }
 
   const columns: DataTableColumn<TrendingCoin>[] = [
     {
@@ -56,14 +79,12 @@ const TrendingCoins = async () => {
   return (
     <div id="trending-coins">
       <h4>Trending coins</h4>
-      <div id="trending-coins">
         <DataTable
           data={trendingCoins.coins.slice(0, 6) || []}
           columns={columns}
           rowKey={(coin) => coin.item.id}
           tableClassName="trending-coins-table"
         />
-      </div>
     </div>
   );
 };

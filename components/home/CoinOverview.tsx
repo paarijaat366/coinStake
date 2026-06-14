@@ -1,11 +1,32 @@
 import { fetcher } from "@/lib/coingecko.action";
 import React from "react";
-import DataTable from "../ui/DataTable";
 
 const CoinOverview = async () => {
-  const coin = await fetcher<CoinDetailsData>("/coins/bitcoin", {
-    dex_pair_format: "symbol",
-  });
+  let coin: CoinDetailsData | null = null;
+
+  try {
+    coin = await fetcher<CoinDetailsData>("/coins/bitcoin", {
+      dex_pair_format: "symbol",
+    });
+  } catch (error) {
+    console.error("CoinOverview fetch failed", error);
+    return (
+      <div id="coin-overview" className="p-4 bg-dark-500 rounded-xl">
+        <div className="header pt-2">
+          <div className="w-14 h-14 rounded-full bg-dark-400" />
+          <div className="info">
+            <p className="text-sm text-muted-foreground">Unable to load coin overview.</p>
+            <h1 className="text-xl font-semibold">Please try again later.</h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!coin) {
+    return null;
+  }
+
   return (
     <div>
       <div id="coin-overview">
